@@ -26,7 +26,7 @@ from scipy.fft import ifft2, fftshift
 import os
 import re
 import h5py
-import cv2
+#import cv2
 # import keras_unet
 #
 # from keras_unet.models import satellite_unet
@@ -303,8 +303,9 @@ def prepare_datasets():
         -- test_outputs: ground truth image
     """
 
-    file_path = '/Users/xiaoqingliu/Downloads/singlecoil_val'
-    # output_path = '/Users/xiaoqingliu/Downloads/singlecoil_val_distorted_image'
+    cwd = os.path.dirname(os.path.realpath(__file__))
+    #file_path = os.path.join('singlecoil_val'
+    file_path = os.path.join(cwd, 'single_coil_test_image')
     display = False
     h5_re = re.compile('.+(?=\.h5$)')
 
