@@ -11,7 +11,7 @@ Comments:
 
 import tensorflow as tf
 from keras.models import Model
-from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Conv2DTranspose, BatchNormalization
+from keras.layers import Input, Conv2D, UpSampling2D, Conv2DTranspose, BatchNormalization
 from keras.layers import Activation, MaxPool2D, Concatenate
 from keras.models import load_model
 
@@ -25,15 +25,6 @@ from scipy.fft import ifft2, fftshift
 import os
 import re
 import h5py
-#import cv2
-# import keras_unet
-#
-# from keras_unet.models import satellite_unet
-# def u2():
-#     model = satellite_unet(input_shape=(320, 320, 1))
-#     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.0001), loss='mae')
-#     return model
-
 
 IMAGE_WIDTH = 320
 IMAGE_HEIGHT =320
@@ -120,43 +111,6 @@ def build_unet():
     model = Model(inputs, outputs, name="U-Net")
     return model
 
-
-# def train_predict_model(inputs, outputs, test_inputs):
-#     model = build_unet()
-#     # model.compile(optimizer='adam', loss=tf.keras.losses.MeanAbsoluteError(), metrics=['mae'])
-#     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.01), loss=tf.keras.losses.MeanAbsoluteError(), metrics=['mae'])
-#
-#     """
-#     Model checkpoint
-#     """
-#     checkpointer = tf.keras.callbacks.ModelCheckpoint('model_for_mri.h5', verbose=1, save_best_only=True)
-#     callbacks = [tf.keras.callbacks.EarlyStopping(patience=2, monitor='val_loss'),
-#                  tf.keras.callbacks.TensorBoard(log_dir='mri_logs')]
-#     history = model.fit(x=np.array(inputs, np.float32), y=np.array(outputs, np.float32), batch_size=2, epochs=5, verbose=1, callbacks=callbacks,
-#                         validation_split=0.1, shuffle=True)
-#     ###########################################################
-#     """
-#     To check the performance of the U net
-#     """
-#     preds_train = model.predict(np.array(inputs, np.float32), verbose=1)
-#     idx = random.randint(0, len(preds_train))
-#     imshow(inputs[idx])
-#     plt.show()
-#     reconstruction_train_img = np.squeeze(preds_train[idx])
-#     # reconstruction_img = (reconstruction_img - np.min(reconstruction_img)) / (np.max(reconstruction_img) - np.min(reconstruction_img))
-#     imshow(np.log(reconstruction_train_img + 1e-10), cmap="gray")
-#     plt.show()
-#
-#     preds_test = model.predict(np.array(test_inputs, np.float32), verbose=1)
-#
-#     idx = random.randint(0, len(preds_test))
-#     imshow(test_inputs[idx])
-#     plt.show()
-#     reconstruction_img = np.squeeze(preds_test[idx])
-#     # reconstruction_img = (reconstruction_img - np.min(reconstruction_img)) / (np.max(reconstruction_img) - np.min(reconstruction_img))
-#     imshow(np.log(reconstruction_img + 1e-10), cmap="gray")
-#     plt.show()
-#     print('ok')
 
 def train_model(inputs, outputs):
     """ The purpose of this function is to train the U-net model
@@ -259,14 +213,16 @@ def predict_reconstruct_image(test_inputs):
 
     preds_test = model.predict(np.array(test_inputs, np.float32), verbose=1)
 
-    idx = random.randint(0, len(preds_test))
+    idx = random.randint(0, len(preds_test)-1)
     imshow(test_inputs[idx])
+    plt.title("Test Image")
     plt.show()
     reconstruction_img = np.squeeze(preds_test[idx])
     # reconstruction_img = (reconstruction_img - np.min(reconstruction_img)) / (np.max(reconstruction_img) - np.min(reconstruction_img))
     imshow(np.log(100 * reconstruction_img + 1e-10), cmap="gray")
+    plt.title("Reconstruct Image")
     plt.show()
-    print('ok')
+    print('Done')
 
 """
 Reconstruction evaluation metrics
@@ -430,7 +386,6 @@ def main():
     to reconstruct images
     """
     train_inputs, train_outputs,test_inputs,test_outputs = prepare_datasets()
-    # train_predict_model(train_inputs, train_outputs, test_inputs)
     Training = False
     if Training == True:
         train_model(train_inputs, train_outputs)
